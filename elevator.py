@@ -6,18 +6,43 @@ class Elevator:
     _current_capacity = 0
     _max_capacity = 1
     _current_floor = 1
+    _min_floor = 0
+    _max_floor = 1
 
 
-    def __init__(self, max_capacity: int, current_capacity = 0, current_floor = 1):
+    def __init__(self, max_capacity: int, min_floor: int, max_floor:int, current_capacity = 0, current_floor = 1):
         self._max_capacity = max_capacity
         self._current_floor = current_floor
-        self._capacity_check(current_capacity)
         self._current_capacity = current_capacity
+        self._min_floor = min_floor
+        self._max_floor = max_floor
+        self._input_check()
 
 
-    def _capacity_check(self, current):
-        if (current > self._max_capacity) or (self._max_capacity < 1):
+    def _input_check(self):
+        if (self._current_capacity > self._max_capacity) or (self._max_capacity < 1):
             raise ValueError(f"Invalid maximum capacity ({self._max_capacity})")
+        
+        if not (self._min_floor <= self._current_floor <= self._max_floor):
+            raise ValueError(f"Invalid floor parameters\nmin: {self._min_floor}\nmax: {self._max_floor}\ncurrent: {self._current_floor}")
+
+
+    def __str__(self):
+        """
+        Visualize the elevator
+        """
+        output = ""
+        output += 7*"-" + "\n"
+        for i in range((self._max_floor - self._min_floor),-1,-1):
+            if (i+1 == self._current_floor):
+                output += f"{i+1: <3} X\n"
+            output += f"{i+1: <3} |\n"
+        output += 7*"-"
+        return output
+
+
+    def capacity(self):
+        return self._current_capacity
 
 
     def is_full(self):
@@ -27,6 +52,10 @@ class Elevator:
     def capacity_left(self):
         return self._max_capacity - self._current_capacity
 
+    
+    def floor(self):
+        return self._current_floor
+    
 
     def enter(self, amount = 1):
         """
@@ -68,10 +97,29 @@ class Elevator:
         self._current_capacity -= amount
         return self.capacity_left()
 
+
+    def move_up(self):
+        """
+        Moves up the elevator.
+        
+        Returns:
+            New floor of the elevator
+        """
+        ...
     
+
+    def move_down(self):
+        """
+        Moves down the elevator.
+        
+        Returns:
+            New floor of the elevator
+        """
+        ...
+
 
 
 if __name__ == "__main__":
 
-    elev1 = Elevator(2, 1)
-    print("done!")
+    elev1 = Elevator(2, 1, 10, 2, 2)
+    print(elev1)
