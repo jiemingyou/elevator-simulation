@@ -2,7 +2,7 @@ from person import Person
 
 class Elevator:
     """
-    Class representing a single elevator
+    Class representing a single elevator.
     """
 
     _max_capacity = 1
@@ -66,9 +66,15 @@ class Elevator:
     # Current floor
     def floor(self):
         return self._current_floor
+
+    def is_min_floor(self):
+        return self._current_floor == self._min_floor
+
+    def is_max_floor(self):
+        return self._current_floor == self._max_floor
     
 
-    def move_up(self, log=True):
+    def move_up(self, log=True, error=True):
         """
         Moves up the elevator.
         Logs passanger travel time.
@@ -80,13 +86,16 @@ class Elevator:
             self._log_time()
 
         if self._current_floor >= self._max_floor:
-            raise ValueError("Already top floor")
+            if error:
+                raise ValueError("Already top floor")
+            else:
+                return
 
         self._current_floor += 1
         return self._current_floor
 
     
-    def move_down(self, log=True):
+    def move_down(self, log=True, error=True):
         """
         Moves down the elevator.
         Logs passanger travel time.
@@ -98,7 +107,10 @@ class Elevator:
             self._log_time()
 
         if self._current_floor <= self._min_floor:
-            raise ValueError("Already bottom floor")
+            if error:
+                raise ValueError("Already bottom floor")
+            else:
+                return
 
         self._current_floor -= 1
         return self._current_floor
