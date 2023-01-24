@@ -28,34 +28,11 @@ class Elevator:
             raise ValueError(f"Invalid floor parameters\nmin: {self._min_floor}\nmax: {self._max_floor}\ncurrent: {self._current_floor}")
 
 
+    def _log_time(self):
+        for p in self._passangers:
+            p.add_elevator_time()
 
 
-    def _move_up(self):
-        """
-        Moves up the elevator.
-        
-        Returns:
-            New floor of the elevator
-        """
-        if self._current_floor >= self._max_floor:
-            raise ValueError("Already top floor")
-
-        self._current_floor += 1
-        return self._current_floor
-
-    
-    def _move_down(self):
-        """
-        Moves down the elevator.
-        
-        Returns:
-            New floor of the elevator
-        """
-        if self._current_floor <= self._min_floor:
-            raise ValueError("Already bottom floor")
-
-        self._current_floor -= 1
-        return self._current_floor
 
 
     def __str__(self):
@@ -66,12 +43,14 @@ class Elevator:
         output += 6*"-" + "\n"
         for i in range((self._max_floor - self._min_floor),-1,-1):
             if (i+1 == self._current_floor):
-                output += f"{i+1: <3} X\n"
-            output += f"{i+1: <3} |\n"
+                output += f"{i+1: <3} {self.capacity()}\n"
+            else:
+                output += f"{i+1: <3} |\n"
         output += 6*"-"
         return output
 
 
+    # Passanger count
     def capacity(self):
         return len(self._passangers)
 
@@ -84,9 +63,46 @@ class Elevator:
         return self._max_capacity - self.capacity()
 
     
+    # Current floor
     def floor(self):
         return self._current_floor
     
+
+    def move_up(self, log=True):
+        """
+        Moves up the elevator.
+        Logs passanger travel time.
+        
+        Returns:
+            New floor of the elevator
+        """
+        if log:
+            self._log_time()
+
+        if self._current_floor >= self._max_floor:
+            raise ValueError("Already top floor")
+
+        self._current_floor += 1
+        return self._current_floor
+
+    
+    def move_down(self, log=True):
+        """
+        Moves down the elevator.
+        Logs passanger travel time.
+        
+        Returns:
+            New floor of the elevator
+        """
+        if log:
+            self._log_time()
+
+        if self._current_floor <= self._min_floor:
+            raise ValueError("Already bottom floor")
+
+        self._current_floor -= 1
+        return self._current_floor
+
 
     def enter(self, persons: list[Person]):
         """
@@ -96,17 +112,17 @@ class Elevator:
             persons: List of Persons
         
         Returns:
-            List of oeople NOT boarded into the elevator
+            List of people boarded into the elevator
         """
         capacity = self.capacity_left()
         amount = len(persons)
 
         if capacity >= amount:
             self._passangers += persons
-            return []
+            return persons
         
         self._passangers += persons[0:capacity]
-        return persons[capacity:]
+        return persons[0:capacity]
 
 
     def leave(self):
@@ -117,14 +133,48 @@ class Elevator:
         Returns:
             List of peoples who left the elevator
         """
-        leaving = [x for x in self._passangers if x.to == self._current_floor]
-        self.passangers = [x for x in self._passangers if x not in leaving]
+        leaving = [x for x in self._passangers if x.to() == self._current_floor]
+        self._passangers = [x for x in self._passangers if x not in leaving]
         return leaving
 
+    def enter_leave(self, persons: list[Person] = [], log=True):
+        """
+        Combines the enter and leave functions.
 
+        Returns:
+            A tuple of people who left the elevator and people boarded into the elevator
+        """
+        if log:
+            self._log_time()
+
+        left = self.leave()
+        enter = self.enter(persons)
+
+        return (left, enter)
 
 if __name__ == "__main__":
 
+    # Setting up the elevator
     person1 = Person(2, 5)
-    elev1 = Elevator(2, 1, 6, 1)
-    print(elev1)
+    elevator1 = Elevator(max_capacity=2, min_floor=1, max_floor=6, current_floor=1)
+    print(elevator1)
+
+    # Move up to floor 2
+    elevator1.move_up()
+    print(elevator1)
+
+    # Enter the passanger
+    elevator1.enter_leave([person1])
+    print(elevator1)
+
+    # Move up to floor 5
+    for i in range(3):
+        elevator1.move_up()
+    print(elevator1)
+
+    # Leave the passanger
+    elevator1.enter_leave()
+    print(elevator1)
+
+    # Print the total travel time
+    print(person1.time())

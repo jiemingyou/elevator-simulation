@@ -12,10 +12,10 @@ class Person:
         self._at = at
         self._to = to
     
-    def _add_wait_time(self):
+    def add_wait_time(self):
         self._waiting_time += 1
     
-    def _add_elevator_time(self):
+    def add_elevator_time(self):
         self._time_in_elevator += 1
 
     def at(self):
@@ -23,6 +23,9 @@ class Person:
 
     def to(self):
         return self._to
+    
+    def time(self):
+        return self._waiting_time + self._time_in_elevator
 
 
     
