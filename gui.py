@@ -16,16 +16,22 @@ elevator = Elevator(max_capacity=6, min_floor=1, max_floor=10)
 
 
 def floor_selector(floors: int):
+    # Show
     for i in range(floors):
         graph.TKCanvas.itemconfig(elevator_markers[i], fill = "lightgray")
         graph.TKCanvas.itemconfig(floor_markers[i], fill = "black")
         graph.TKCanvas.itemconfig(text_markers[i], fill = "black")
+    # Hide
     for i in range(floors, FLOORS):
         graph.TKCanvas.itemconfig(elevator_markers[i], fill = "white")
         graph.TKCanvas.itemconfig(floor_markers[i], fill = "white")
         graph.TKCanvas.itemconfig(text_markers[i], fill = "white")
 
+
 def current_floor(idx):
+    """
+    Displays the elevator's current location
+    """
     graph.TKCanvas.itemconfig(elevator_markers[idx-1], fill = "SeaGreen2")
 
 # Define the window's contents
@@ -38,20 +44,24 @@ GUI = [
 ]
 
 floor_slider = sg.Slider((2,10), orientation='h', key="-FLOORS-", enable_events = True)
+start_button = sg.Button('Start', s=(5, 1.1), button_color="green")
+up_button = sg.Button('Up', s=(5, 1.1), button_color="gray", disabled=True)
+down_button = sg.Button('Down', s=(5, 1.1), button_color="gray", disabled=True)
 
 SETTINGS = [
     [sg.Text("FLOORS:"), floor_slider],
     [sg.HSeparator(pad=50)],
-    [sg.Button('Up', s=(5, 1.1))],
-    [sg.Button('Down', s=(5, 1.1))],
+    [up_button],
+    [down_button],
     [sg.HSeparator(pad=50)],
-    [sg.Button('Start', s=(5, 1.1)), sg.Button('Quit', s=(5, 1.1))]
+    [start_button],
+    [sg.Button('Quit', s=(5, 1.1), button_color="red")]
 ]
 
 layout = [
-    [sg.Column(GUI),
+    [sg.pin(sg.Column(GUI)),
     sg.VSeperator(),
-    sg.Column(SETTINGS, element_justification="c")]
+    sg.pin(sg.Column(SETTINGS, element_justification="c"))]
 ]
 
 # Create the window
@@ -75,21 +85,27 @@ text_markers = []
 for i in range(1, FLOORS+1):
     text_markers.append(graph.DrawText(f"Floor {i}", location=(CANVAS_SIZE[0]-30, i*FLOOR_HEIGHT + FLOOR_HEIGHT/2)))
 
+
 # Display and interact with the Window using an Event Loop
 while True:
     event, values = window.read()
-    floors = int(values["-FLOORS-"])
+    
     # Display correct amount of floors
+    floors = int(values["-FLOORS-"])
     floor_selector(floors)
+    elevator._max_floor = floors
 
+    
     # See if user wants to quit or window was closed
     if event == sg.WINDOW_CLOSED or event == 'Quit':
         break
 
-    # Intiate the elevator!
+    # Start the simulation
     if event == 'Start':
-        elevator._max_floor = floors
-        floor_slider.update(disabled=True)
+        floor_slider.update(disabled=True, visible=False)
+        start_button.update(disabled=True, visible=False)
+        up_button.update(disabled=False, button_color=sg.theme_button_color())
+        down_button.update(disabled=False, button_color=sg.theme_button_color())
 
     if event == 'Up':
         elevator.move_up(error=False)

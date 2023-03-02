@@ -33,8 +33,6 @@ class Elevator:
             p.add_elevator_time()
 
 
-
-
     def __str__(self):
         """
         Visualize the elevator
@@ -56,7 +54,7 @@ class Elevator:
 
 
     def is_full(self):
-        return self._max_capacity == self.capacity()()
+        return self._max_capacity == self.capacity()
 
 
     def capacity_left(self):
