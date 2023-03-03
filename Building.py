@@ -18,12 +18,14 @@ class Building:
         for i in range(1, self.max_floors+1):
             output += f"Floor {i}:\t{len(self.floors[i]) * '*'}\n"
         return output
+
     
     floors = {}
 
     def _init_floors(self):
         for i in range(self.max_floors):
             self.floors[i+1] = []
+            
 
     def wait_times(self) -> list[float]:
         """

@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-import keyboard
 from Elevator import Elevator
 from Person import Person
 
@@ -11,6 +10,7 @@ CANVAS_SIZE = (400, 600)
 FLOORS = 10
 FLOOR_HEIGHT = 50
 BG_COLOR = "white"
+MAX_PERSONS_PER_FLOOR = 10
 
 # Initiate the class instance
 elevator = Elevator(max_capacity=6, min_floor=1, max_floor=10)
@@ -47,7 +47,7 @@ GUI = [
 floor_slider    = sg.Slider((2,10), orientation='h', key="-FLOORS-", enable_events = True)
 start_button    = sg.Button('Start', s=(5, 1.1), button_color="green")
 up_button       = sg.Button('Up', s=(5, 1.1), button_color="gray", disabled=True)
-stay_button     = sg.Button('Stay', s=(5, 1.1), button_color="gray", disabled=True)
+load_button     = sg.Button('Load/Unload', s=(5, 1.1), button_color="gray", disabled=True)
 down_button     = sg.Button('Down', s=(5, 1.1), button_color="gray", disabled=True)
 quit_button     = sg.Button('Quit', s=(5, 1.1), button_color="red")
 
@@ -56,7 +56,7 @@ SETTINGS = [
     [sg.Text("FLOORS:"), floor_slider],
     [sg.HSeparator(pad=50)],
     [up_button],
-    [stay_button],
+    [load_button],
     [down_button],
     [sg.HSeparator(pad=50)],
     [start_button],
@@ -75,7 +75,7 @@ window = sg.Window('Elevator-Simulation', layout, finalize = True)
 # Drawing the objects
 graph = window['graph']
 
-# Constrcting the GUI
+# -------- Constrcting the GUI --------
 floor_markers = []
 elevator_markers = []
 text_markers = []
@@ -90,6 +90,17 @@ for i in range(1,FLOORS+1):
     
     # Texts
     text_markers.append(graph.DrawText(f"Floor {i}", location=(CANVAS_SIZE[0]-30, i*FLOOR_HEIGHT + FLOOR_HEIGHT/2)))
+
+# -------- Constrcting the Persons --------
+person_markers = {}
+for i in range(1, FLOORS+1):
+    temp = []
+    for j in range(MAX_PERSONS_PER_FLOOR):
+        temp.append(
+            graph.draw_point((80 + 20*j, FLOOR_HEIGHT*i+15), size=15, color = 'white')
+        )
+    person_markers[i] = temp
+
 
 
 # Display and interact with the Window using an Event Loop
@@ -111,7 +122,7 @@ while True:
         floor_slider.update(disabled=True, visible=False)
         start_button.update(disabled=True, visible=False)
         up_button.update(disabled=False, button_color=sg.theme_button_color())
-        stay_button.update(disabled=False, button_color=sg.theme_button_color())
+        load_button.update(disabled=False, button_color=sg.theme_button_color())
         down_button.update(disabled=False, button_color=sg.theme_button_color())
 
     if event == 'Up':
@@ -120,7 +131,7 @@ while True:
     if event == 'Down':
         elevator.move_down(error=False)
 
-    if event == 'Stay':
+    if event == 'Load/Unload':
         pass
 
     # Display current floor
